@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>After School Activities</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+    <link href="styles.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"
+        integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous" />
+    <script src="lessons.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <main>
+            <!-- Shows lessons if 'showLesson' is True -->
+            <div v-if="showLesson" class="lessons-container">
+                <!-- NAVIGATION BAR -->
+                <div class="navbar">
+                    <h1>After School Activities</h1>
+                    <!-- Shows checkout button only if cart array contains items -->
+                    <button v-on:click='showCheckout' v-if="cartItemCount > 0">
+                        <!--Displays number of elements in cart array-->
+                        {{ cartItemCount }}
+                        <span class="fas fa-cart-plus"></span>Checkout
+                    </button>
+                    <!-- Shows disabled button when cart array is empty -->
+                    <button disabled="disabled" v-else style="opacity: 0.7;">
+                        <!--Displays number of elements in cart array-->
+                        {{ cartItemCount }}
+                        <span class="fas fa-cart-plus"></span>Checkout
+                    </button>
+                </div>
+                <!-- FILTER CONTAINER -->
+                <div class="filter-container">
+                    <!-- SEARCH BAR -->
+                    <div class="search-container">
+                        <h1>Search</h1>
+                        <p>
+                            <!-- Search input using v-model -->
+                            <input type="text" v-model.trim="searchQuery" placeholder="Search here!">
+                        </p>
+                    </div>
+                    <!-- SORT CONTAINER -->
+                    <div class="sort-container">
+                        <h1>Sort</h1>
+                        <p>
+                            <!-- Radio buttons for each sort type using v-model -->
+                            <input type="radio" id="subject" value="subject" v-model="sortType">
+                            <label for="subject">Subject</label><br>
+                            <input type="radio" id="location" value="location" v-model="sortType">
+                            <label for="location">Location</label><br>
+                            <input type="radio" id="price" value="price" v-model="sortType">
+                            <label for="price">Price</label><br>
+                            <input type="radio" id="availableInventory" value="availableInventory" v-model="sortType">
+                            <label for="availableInventory">Available Inventory</label><br>
+                            <input type="radio" id="rating" value="rating" v-model="sortType">
+                            <label for="rating">Rating</label><br>
+                        </p>
+                        <h1>Order</h1>
+                        <!-- Radio buttons for sort order using v-model -->
+                        <input type="radio" id="asc" value="ascending" v-model="sortOrder">
+                        <label for="asc">Ascending</label><br>
+                        <input type="radio" id="desc" value="descending" v-model="sortOrder">
+                        <label for="desc">Descending</label><br><br>
+                    </div>
+                </div>
+                <!-- LESSONS CONTAINER -->
+                <div class="all-lessons-container">
+                    <!-- v-for used to display lessons from sortedLessons array -->
+                    <div class="lesson-box" v-for="lesson in sortedLessons">
+                        <figure>
+                            <!--bind 'src' attr to 'lesson.image' in 'data'-->
+                            <img v-bind:src="lesson.image" style="height: 200px; width: 200px;">
+                        </figure>
+                        <p>
+                            <span id="subject-title">{{lesson.subject}}</span> <br><br><br>
+                            Location: {{lesson.location}} <br><br>
+                            Price: {{lesson.price}} <br><br>
+                            Available Inventory: {{lesson.availableInventory}} <br><br><br>
+
+                            <!-- Add to Cart Button will be displayed if availableInventory is more than 0 -->
+                            <button v-on:click="addToCart(lesson)" v-if="lesson.availableInventory > 0">
+                                Add To Cart
+                            </button>
+
+                            <!--This button will be displayed otherwise-->
+                            <button disabled="disabled" v-else style="opacity: 0.5;">
+                                Add To Cart
+                            </button>
+                            <!-- Message is displayed is availableInventory is 0 -->
+                            <span v-if="lesson.availableInventory === 0">All out!</span>
+                            <span v-else-if="lesson.availableInventory < 5">Only
+                                {{lesson.availableInventory}} left!</span>
+                            <span v-else>Buy now!</span> <br>
+                            <!-- Rating styles -->
+                            <span v-for="n in lesson.rating">★</span>
+                            <span v-for="n in 5-lesson.rating">☆</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div v-else class="checkout-container">
+                <!-- CHECKOUT CONTAINER -->
+                <div class="navbar">
+                    <h1>Cart Details</h1>
+                    <button v-on:click='showCheckout'>
+                        {{ cartItemCount }}
+                        <span class="fas fa-cart-plus"></span>Checkout
+                    </button>
+                </div>
+                <!-- CART DETAILS -->
+                <div class="cart-container">
+                    <!-- Cart items displayed from cart array using v-for -->
+                    <div class="cart-items" v-for="item in cart">
+                        <div class="lesson-box" v-for="lesson in lessons" v-if="lesson.id === item.id">
+                            <figure>
+                                <!--bind 'src' attr to 'lesson.image' in 'data'-->
+                                <img v-bind:src="lesson.image" style="height: 200px; width: 200px;">
+                            </figure>
+                            <p>
+                                <span id="subject-title">{{lesson.subject}}</span> <br><br><br>
+                                Location: {{lesson.location}} <br><br>
+                                Quantity: {{item.quantity}} <br><br>
+                                Price: {{lesson.price * item.quantity}} <br><br><br>
+
+                                <!-- Remove from Cart Button will be displayed if availableInventory is more than 0 -->
+                                <button v-on:click="removeFromCart(lesson)">
+                                    REMOVE
+                                </button>
+
+                                <!-- This button will be displayed otherwise -->
+                                <button disabled="disabled" v-else style="opacity: 0.5;">
+                                    REMOVE
+                                </button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- CHECKOUT BOX -->
+                <div class="checkout-box">
+                    <p>
+                        <span id="subject-title">Checkout Details</span> <br><br>
+                        <strong>Name:</strong>
+                        <!--This input field is bound to 'name' in the 'order' object-->
+                        <input v-model.trim="order.name" placeholder="Enter Name Here"/>
+
+                        <strong>Contact Number:</strong>
+                        <!--This input field is bound to 'contactNumber' in the 'order' object-->
+                        <input v-model.trim="order.contactNumber" placeholder="05X-XXX-XXXX"/>
+
+                        <!--This button will be displayed only when Name and Contact Number fields are filled-->
+                        <button v-on:click="submitForm()" v-if="order.name != '' && order.contactNumber != ''">
+                            Place Order!
+                        </button>
+
+                        <!--This button will be displayed otherwise-->
+                        <button disabled="disabled" v-else style="opacity: 0.5;">
+                            Place Order!
+                        </button>&nbsp;&nbsp;<span id="errorMsg" style="color: red;"></span>
+                    </p>
+                </div>
+            </div>
+    </div>
+
+
+    </main>
+    </div>
+
+    <script type="text/javascript">
+        let webstore = new Vue({ //The Vue instance
+            el: '#app', //The 'option object': DOM mounting point
+            data: {
+                showLesson: true,
+                lessons: lessons,
+                cart: [], //array to store items in shopping cart
+                sortType: '',
+                sortOrder: 'ascending', //to default sorting order to ascending
+                searchQuery: '',
+                order: {
+                    name: '',
+                    contactNumber: '',
+                    address: '',
+                },
+            },
+            methods: {
+                addToCart: function (lesson) {
+                    let lessonFound = false;
+                    //Iterate through cart items
+                    for (let i = 0; i < this.cart.length; i++) {
+                        if (this.cart[i].id === lesson.id) {
+                            // If the product is already in the cart, increment the quantity
+                            this.cart[i].quantity += 1;
+                            lessonFound = true;
+                            break;
+                        }
+                    }
+                    
+                    // If the product is not in the cart, add it with quantity 1
+                    if (!lessonFound) {
+                        this.cart.push({ "id": lesson.id, quantity: 1 });
+                    }
+
+                    // Log each element of the cart individually
+                    this.cart.forEach(item => {
+                        //To Reduce availableInventory when item added to cart
+                        if (item.id === lesson.id) {
+                            if (lesson.availableInventory > 0) {
+                                lesson.availableInventory = 5;
+                                lesson.availableInventory -= item.quantity;
+                            }
+                        }
+                    });
+
+                },
+
+                showCheckout() {
+                    this.showLesson = this.showLesson ? false : true;
+                },
+                removeFromCart(lesson) {
+                    let foundIndex = this.cart.findIndex(item => item.id === lesson.id); //to find index of cart element
+
+                    if (foundIndex != -1) { //if cart element is found (not -1)
+                        this.cart.forEach(item => { //loop through cart array to find quantity
+                            if (item.id === lesson.id) {
+                                lesson.availableInventory += item.quantity; //change available inventory
+                            }
+                        });
+                        this.cart.splice(foundIndex, 1); //remove item from cart array
+                    }
+                },
+                submitForm() {
+                    let errorMessage = document.getElementById("errorMsg");
+                    let nameRegex = new RegExp(/^[a-zA-Z ]{2,30}$/); //regular expression for name (alphabets only, 2-30 characters)
+                    let numberRegex = new RegExp(/^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/); //regular expression for contact number (length 10)
+                    
+                    if(!nameRegex.test(this.order.name)){ //name validation
+                        errorMessage.innerHTML = "Please use letters only (2-30 characters)";
+                        return;
+                    }
+
+                    if (!numberRegex.test(this.order.contactNumber)) { //number validation
+                        errorMessage.innerHTML = "Please enter a valid phone number";
+                        return;
+                    }
+                    alert('Order Submitted!')
+                },
+            },
+            computed: { //the computed property object
+                cartItemCount: function () {  //the property name
+                    //its value when calculated
+                    return this.cart.length || '';
+                },
+                //Sorting method
+                sortedLessons() {
+                    let lessonsArray = this.lessons.slice(0);
+                    //Search feature
+                    let query = this.searchQuery.toLowerCase();
+                    lessonsArray = lessonsArray.filter(lesson =>
+                        lesson.subject.toLowerCase().includes(query) || lesson.location.toLowerCase().includes(query)
+                    );
+                    //Sorting subject asc
+                    if (this.sortType === "subject" && this.sortOrder === "ascending") {
+                        function compare(a, b) {
+                            let sub1 = a.subject.toLowerCase();
+                            let sub2 = b.subject.toLowerCase();
+                            if (sub1 > sub2) {
+                                return 1;
+                            }
+                            if (sub1 < sub2) {
+                                return -1;
+                            }
+                            return 0;
+                        }
+                    }
+                    //Sorting subject desc
+                    if (this.sortType === "subject" && this.sortOrder === "descending") {
+                        function compare(a, b) {
+                            let sub1 = a.subject.toLowerCase();
+                            let sub2 = b.subject.toLowerCase();
+                            if (sub1 < sub2) {
+                                return 1;
+                            }
+                            if (sub1 > sub2) {
+                                return -1;
+                            }
+                            return 0;
+                        }
+                    }
+                    //Sorting location asc
+                    if (this.sortType === "location" && this.sortOrder === "ascending") {
+                        function compare(a, b) {
+                            let loc1 = a.location.toLowerCase();
+                            let loc2 = b.location.toLowerCase();
+                            if (loc1 > loc2) {
+                                return 1;
+                            }
+                            if (loc1 < loc2) {
+                                return -1;
+                            }
+                            return 0;
+                        }
+                    }
+                    //Sorting location desc
+                    if (this.sortType === "location" && this.sortOrder === "descending") {
+                        function compare(a, b) {
+                            let loc1 = a.location.toLowerCase();
+                            let loc2 = b.location.toLowerCase();
+                            if (loc1 < loc2) {
+                                return 1;
+                            }
+                            if (loc1 > loc2) {
+                                return -1;
+                            }
+                            return 0;
+                        }
+                    }
+                    //Sorting price asc
+                    if (this.sortType === "price" && this.sortOrder === "ascending") {
+                        function compare(a, b) {
+                            if (a.price > b.price)
+                                return 1;
+                            if (a.price < b.price)
+                                return -1;
+                            return 0;
+                        }
+                    }
+                    //Sorting price desc
+                    if (this.sortType === "price" && this.sortOrder === "descending") {
+                        function compare(a, b) {
+                            if (a.price < b.price)
+                                return 1;
+                            if (a.price > b.price)
+                                return -1;
+                            return 0;
+                        }
+                    }
+                    //Sorting rating asc
+                    if (this.sortType === "rating" && this.sortOrder === "ascending") {
+                        function compare(a, b) {
+                            if (a.rating > b.rating)
+                                return 1;
+                            if (a.rating < b.rating)
+                                return -1;
+                            return 0;
+                        }
+                    }
+                    //Sorting rating desc
+                    if (this.sortType === "rating" && this.sortOrder === "descending") {
+                        function compare(a, b) {
+                            if (a.rating < b.rating)
+                                return 1;
+                            if (a.rating > b.rating)
+                                return -1;
+                            return 0;
+                        }
+                    }
+                    //Sorting available inventory asc
+                    if (this.sortType === "availableInventory" && this.sortOrder === "ascending") {
+                        function compare(a, b) {
+                            if (a.availableInventory > b.availableInventory)
+                                return 1;
+                            if (a.availableInventory < b.availableInventory)
+                                return -1;
+                            return 0;
+                        }
+                    }
+                    //Sorting available inventory desc
+                    if (this.sortType === "availableInventory" && this.sortOrder === "descending") {
+                        function compare(a, b) {
+                            if (a.availableInventory < b.availableInventory)
+                                return 1;
+                            if (a.availableInventory > b.availableInventory)
+                                return -1;
+                            return 0;
+                        }
+                    }
+
+                    return lessonsArray.sort(compare);
+                }
+
+            }
+        });
+    </script>
+</body>
+
+</html>
