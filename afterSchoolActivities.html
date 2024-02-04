@@ -140,11 +140,11 @@
                         <span id="subject-title">Checkout Details</span> <br><br>
                         <strong>Name:</strong>
                         <!--This input field is bound to 'name' in the 'order' object-->
-                        <input v-model.trim="order.name" placeholder="Enter Name Here" />
+                        <input v-model.trim="order.name" placeholder="Enter Name Here" id="orderName" />
 
                         <strong>Contact Number:</strong>
                         <!--This input field is bound to 'contactNumber' in the 'order' object-->
-                        <input v-model.trim="order.contactNumber" placeholder="05X-XXX-XXXX" />
+                        <input v-model.trim="order.contactNumber" placeholder="05X-XXX-XXXX" id="orderContact"/>
 
                         <!--This button will be displayed only when Name and Contact Number fields are filled-->
                         <button v-on:click="submitForm()" v-if="order.name != '' && order.contactNumber != ''">
@@ -195,7 +195,7 @@
 
                     // If the product is not in the cart, add it with quantity 1
                     if (!lessonFound) {
-                        this.cart.push({ "id": lesson.id, quantity: 1 });
+                        this.cart.push({ "id": lesson.id, "subject": lesson.subject, quantity: 1 });
                     }
 
                     // Log each element of the cart individually
@@ -230,6 +230,8 @@
                     let errorMessage = document.getElementById("errorMsg");
                     let nameRegex = new RegExp(/^[a-zA-Z ]{2,30}$/); //regular expression for name (alphabets only, 2-30 characters)
                     let numberRegex = new RegExp(/^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/); //regular expression for contact number (length 10)
+                    let orderName = document.getElementById("orderName").value;
+                    let orderContact = document.getElementById("orderContact").value;
 
                     if (!nameRegex.test(this.order.name)) { //name validation
                         errorMessage.innerHTML = "Please use letters only (2-30 characters)";
@@ -241,9 +243,10 @@
                         return;
                     }
                     
-                    const newOrder = { lessonID: "", price: 49 };
+                    //Creating newOrder Array to send JSON data to backend
+                    const newOrder = {name: orderName, contact: orderContact, cartItem: "" };
                     this.cart.forEach(item => {
-                        newOrder.lessonID = item.id + ", ";
+                        newOrder.cartItem += item.subject + "[" + item.id + "] x" + item.quantity + ", ";
                     })
                     // set the url to your server and route
                     fetch('http://localhost:3000/collection/orders', {
@@ -254,8 +257,9 @@
                         body: JSON.stringify(newOrder), // need to stringify the JSON object
                     })
                         .then(response => response.json())
-                        .then(alert("Order Placed!"))
+                        // .then(alert("Order Placed!"))
                 },
+
             },
             computed: { //the computed property object
                 cartItemCount: function () {  //the property name
