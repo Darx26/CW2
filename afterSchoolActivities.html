@@ -130,11 +130,6 @@
                                 <button v-on:click="removeFromCart(lesson)">
                                     REMOVE
                                 </button>
-
-                                <!-- This button will be displayed otherwise -->
-                                <button disabled="disabled" v-else style="opacity: 0.5;">
-                                    REMOVE
-                                </button>
                             </p>
                         </div>
                     </div>
@@ -145,11 +140,11 @@
                         <span id="subject-title">Checkout Details</span> <br><br>
                         <strong>Name:</strong>
                         <!--This input field is bound to 'name' in the 'order' object-->
-                        <input v-model.trim="order.name" placeholder="Enter Name Here"/>
+                        <input v-model.trim="order.name" placeholder="Enter Name Here" />
 
                         <strong>Contact Number:</strong>
                         <!--This input field is bound to 'contactNumber' in the 'order' object-->
-                        <input v-model.trim="order.contactNumber" placeholder="05X-XXX-XXXX"/>
+                        <input v-model.trim="order.contactNumber" placeholder="05X-XXX-XXXX" />
 
                         <!--This button will be displayed only when Name and Contact Number fields are filled-->
                         <button v-on:click="submitForm()" v-if="order.name != '' && order.contactNumber != ''">
@@ -197,7 +192,7 @@
                             break;
                         }
                     }
-                    
+
                     // If the product is not in the cart, add it with quantity 1
                     if (!lessonFound) {
                         this.cart.push({ "id": lesson.id, quantity: 1 });
@@ -235,8 +230,8 @@
                     let errorMessage = document.getElementById("errorMsg");
                     let nameRegex = new RegExp(/^[a-zA-Z ]{2,30}$/); //regular expression for name (alphabets only, 2-30 characters)
                     let numberRegex = new RegExp(/^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/); //regular expression for contact number (length 10)
-                    
-                    if(!nameRegex.test(this.order.name)){ //name validation
+
+                    if (!nameRegex.test(this.order.name)) { //name validation
                         errorMessage.innerHTML = "Please use letters only (2-30 characters)";
                         return;
                     }
@@ -245,7 +240,21 @@
                         errorMessage.innerHTML = "Please enter a valid phone number";
                         return;
                     }
-                    alert('Order Submitted!')
+                    
+                    const newOrder = { lessonID: "", price: 49 };
+                    this.cart.forEach(item => {
+                        newOrder.lessonID = item.id + ", ";
+                    })
+                    // set the url to your server and route
+                    fetch('http://localhost:3000/collection/orders', {
+                        method: 'POST', // set the HTTP method as 'POST'
+                        headers: {
+                            'Content-Type': 'application/json', // set the data type as JSON
+                        },
+                        body: JSON.stringify(newOrder), // need to stringify the JSON object
+                    })
+                        .then(response => response.json())
+                        .then(alert("Order Placed!"))
                 },
             },
             computed: { //the computed property object
@@ -384,6 +393,7 @@
             }
         });
     </script>
+
 </body>
 
 </html>
