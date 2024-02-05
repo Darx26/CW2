@@ -265,7 +265,7 @@
                         newOrder.cartItem += item.subject + "[" + item.id + "] x" + item.quantity + ", ";
                     })
 
-                    //finalCartItems Array
+                    //finalCartItems Array to store cart items
                     const finalCartItems = []
                     this.cart.forEach(item => {
                         finalCartItems.push([item._id, item.id, item.subject, item.quantity]);
@@ -281,10 +281,10 @@
                         .then(response => response.json())
                         .then(function () {
                             for (let i = 0; i < finalCartItems.length; i++) {
-                                console.log(lessons[i].availableInventory - finalCartItems[i][3])
-                                if (lessons[i].id === finalCartItems[i][1]) {
+                                //console.log(lessons[i].availableInventory - finalCartItems[i][3])
+                                if (lessons[i].id === finalCartItems[i][1]) { //find respective lesson available Inventory
                                     fetch('http://localhost:3000/collection/lessons/' + finalCartItems[i][0], {
-                                        method: 'PUT', // set the HTTP method as 'POST'
+                                        method: 'PUT', // set the HTTP method as 'PUT'
                                         headers: {
                                             'Content-Type': 'application/json', // set the data type as JSON
                                         },
@@ -292,7 +292,6 @@
                                     })
                                 }
                             }
-
                         }
 
                         )
