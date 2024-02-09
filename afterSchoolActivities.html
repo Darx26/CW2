@@ -40,7 +40,7 @@
                         <h1>Search</h1>
                         <p>
                             <!-- Search input using v-model -->
-                            <input type="text" v-model.trim="searchQuery" placeholder="Search here!">
+                            <input type="text" v-model="searchQuery" placeholder="Search here!">
                         </p>
                     </div>
                     <!-- SORT CONTAINER -->
@@ -70,7 +70,7 @@
                 <!-- LESSONS CONTAINER -->
                 <div class="all-lessons-container">
                     <!-- v-for used to display lessons from sortedLessons array -->
-                    <div class="lesson-box" v-for="lesson in sortedLessons">
+                    <div class="lesson-box" v-for="lesson in searchLessons">
                         <figure>
                             <!--bind 'src' attr to 'lesson.image' in 'data'-->
                             <img v-bind:src="lesson.image" style="height: 200px; width: 200px;">
@@ -171,6 +171,7 @@
                 showLesson: true,
                 lessons: [],
                 cart: [], //array to store items in shopping cart
+                searchedLessons: [],
                 sortType: '',
                 sortOrder: 'ascending', //to default sorting order to ascending
                 searchQuery: '',
@@ -430,6 +431,25 @@
                     }
 
                     return lessonsArray.sort(compare);
+                },
+                searchLessons() {
+                    const searchText = this.searchQuery.toLowerCase(); // Replace with your actual search term
+
+                    fetch(`http://localhost:3000/collection/lessons/search/${searchText}`)
+                        .then(res => {
+                            if (!res.ok) {
+                                throw new Error(`Failed to fetch data: ${res.statusText}`);
+                            }
+                            return res.json();
+                        })
+                        .then(json => {
+                            webstore.searchedLessons = JSON.parse(JSON.stringify(json));
+                            console.log(JSON.parse(JSON.stringify(json)));
+                            // Perform actions with the retrieved data as needed
+                        })
+                        .catch(error => {
+                            console.error(error);
+                        });
                 }
 
             }
