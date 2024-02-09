@@ -70,7 +70,7 @@
                 <!-- LESSONS CONTAINER -->
                 <div class="all-lessons-container">
                     <!-- v-for used to display lessons from sortedLessons array -->
-                    <div class="lesson-box" v-for="lesson in searchLessons">
+                    <div class="lesson-box" v-for="lesson in lessons">
                         <figure>
                             <!--bind 'src' attr to 'lesson.image' in 'data'-->
                             <img v-bind:src="lesson.image" style="height: 200px; width: 200px;">
