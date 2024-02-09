@@ -185,7 +185,7 @@
                 //fetch GET to retrieve lessons from lessons collection and display all lessons
                 function () {
                     // set the url to your server and route
-                    fetch('http://localhost:3000/collection/lessons', {
+                    fetch('http://cst3145-cw2-env.eba-icptt7kh.eu-west-2.elasticbeanstalk.com/collection/lessons', {
                         method: 'GET', // set the HTTP method as 'GET'
                         headers: {
                             'Content-Type': 'application/json', // set the data type as JSON
@@ -272,7 +272,7 @@
                         finalCartItems.push([item._id, item.id, item.subject, item.quantity]);
                     })
                     // fetch POST to add new order to orders collection
-                    fetch('http://localhost:3000/collection/orders', {
+                    fetch('http://cst3145-cw2-env.eba-icptt7kh.eu-west-2.elasticbeanstalk.com/collection/orders', {
                         method: 'POST', // set the HTTP method as 'POST'
                         headers: {
                             'Content-Type': 'application/json', // set the data type as JSON
@@ -284,7 +284,7 @@
                             for (let i = 0; i < finalCartItems.length; i++) {
                                 //console.log(lessons[i].availableInventory - finalCartItems[i][3])
                                 if (lessons[i].id === finalCartItems[i][1]) { //find respective lesson available Inventory
-                                    fetch('http://localhost:3000/collection/lessons/' + finalCartItems[i][0], {
+                                    fetch('http://cst3145-cw2-env.eba-icptt7kh.eu-west-2.elasticbeanstalk.com/collection/lessons/' + finalCartItems[i][0], {
                                         method: 'PUT', // set the HTTP method as 'PUT'
                                         headers: {
                                             'Content-Type': 'application/json', // set the data type as JSON
@@ -436,7 +436,7 @@
                 searchLessons() {
                     const searchText = this.searchQuery.trim().toLowerCase(); // removes whitespaces and changes text to lowercase
                     if (searchText) {
-                        fetch(`http://localhost:3000/collection/lessons/search/${searchText}`)
+                        fetch(`http://cst3145-cw2-env.eba-icptt7kh.eu-west-2.elasticbeanstalk.com/collection/lessons/search/${searchText}`)
                             .then(res => {
                                 if (!res.ok) {
                                     throw new Error(`Failed to fetch data: ${res.statusText}`);
