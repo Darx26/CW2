@@ -40,7 +40,7 @@
                         <h1>Search</h1>
                         <p>
                             <!-- Search input using v-model -->
-                            <input type="text" v-model="searchQuery" placeholder="Search here!">
+                            <input type="text" v-model.trim="searchQuery" v-on:input="searchLessons" placeholder="Search here!">
                         </p>
                     </div>
                     <!-- SORT CONTAINER -->
@@ -182,7 +182,7 @@
                 },
             },
             created:
-                //fetch GET
+                //fetch GET to retrieve lessons from lessons collection and display all lessons
                 function () {
                     // set the url to your server and route
                     fetch('http://localhost:3000/collection/lessons', {
@@ -432,24 +432,27 @@
 
                     return lessonsArray.sort(compare);
                 },
+                //Back-end Search
                 searchLessons() {
-                    const searchText = this.searchQuery.toLowerCase(); // Replace with your actual search term
+                    const searchText = this.searchQuery.trim().toLowerCase(); // removes whitespaces and changes text to lowercase
+                    if (searchText) {
+                        fetch(`http://localhost:3000/collection/lessons/search/${searchText}`)
+                            .then(res => {
+                                if (!res.ok) {
+                                    throw new Error(`Failed to fetch data: ${res.statusText}`);
+                                }
+                                return res.json();
+                            })
+                            .then(json => {
+                                webstore.lessons = JSON.parse(JSON.stringify(json));
+                                console.log(JSON.parse(JSON.stringify(json)));
+                                return webstore.searchedLessons;
+                            })
+                            .catch(error => {
+                                console.error(error);
+                            });
+                    }
 
-                    fetch(`http://localhost:3000/collection/lessons/search/${searchText}`)
-                        .then(res => {
-                            if (!res.ok) {
-                                throw new Error(`Failed to fetch data: ${res.statusText}`);
-                            }
-                            return res.json();
-                        })
-                        .then(json => {
-                            webstore.searchedLessons = JSON.parse(JSON.stringify(json));
-                            console.log(JSON.parse(JSON.stringify(json)));
-                            // Perform actions with the retrieved data as needed
-                        })
-                        .catch(error => {
-                            console.error(error);
-                        });
                 }
 
             }

@@ -100,27 +100,13 @@ app.put('/collection/:collectionName/:id', (req, res, next) => {
     )
 })
 
-//to search
-//GET request with a search query
-// app.get('/collection/:collectionName/:k', (req, res) => {
-//     var key_1 = req.params.k;
-//     console.log("Searched term: " + key_1);
-
-//     req.collection.find(
-//         {$or: [ 
-//             {subject: { $regex: '^'+key_1, $options: "i" }}, 
-//             {location: { $regex: '^'+key_1, $options: "i" }}
-//         ]}).toArray((e, results) => {
-//         if (e) return console.log(e)
-//         res.send(results);
-//     });
-// });
+//GET to perform back-end search
 app.get('/collection/:collectionName/search/:k', (req, res) => {
     const key = req.params.k.toLowerCase();
 
-    console.log("Searched term: " + key);
+    console.log("Searched term: " + key); //logs searched term
 
-    const searchQuery = {
+    const searchQuery = { //checks subject and location field for searched term
         $or: [
             { subject: { $regex: new RegExp(key, "i") } },
             { location: { $regex: new RegExp(key, "i") } }
@@ -133,14 +119,11 @@ app.get('/collection/:collectionName/search/:k', (req, res) => {
             return res.status(500).send('Internal Server Error');
         }
 
-        res.send(results);
+        res.send(results); //sends results back
     });
 });
-// app.listen(3000, () => {
-//     console.log('Express.js server running at localhost:3000')
-// })
 
 const port = process.env.PORT || 3000
 app.listen(port, () => {
-    console.log("Meow")
+    console.log("Running")
 })
